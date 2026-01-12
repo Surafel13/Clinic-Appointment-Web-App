@@ -43,3 +43,41 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [users] = await promisePool.execute(
+      'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
+      [id]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const user = users[0];
+
+    // Get role-specific data
+    if (user.role === 'patient') {
+      const [patients] = await promisePool.execute(
+        'SELECT * FROM patients WHERE user_id = ?',
+        [id]
+      );
+      user.profile = patients[0] || null;
+    } else if (user.role === 'doctor') {
+      const [doctors] = await promisePool.execute(
+        'SELECT * FROM doctors WHERE user_id = ?',
+        [id]
+      );
+      user.profile = doctors[0] || null;
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error('Get user by id error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
