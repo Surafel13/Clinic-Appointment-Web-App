@@ -150,3 +150,132 @@ export const getAppointments = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const getAppointmentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [appointments] = await promisePool.execute(
+      `SELECT a.*, 
+       p.user_id as patient_user_id, u1.name as patient_name, u1.email as patient_email,
+       d.user_id as doctor_user_id, u2.name as doctor_name, u2.email as doctor_email, d.specialization
+       FROM appointments a
+       JOIN patients p ON a.patient_id = p.id
+       JOIN users u1 ON p.user_id = u1.id
+       JOIN doctors d ON a.doctor_id = d.id
+       JOIN users u2 ON d.user_id = u2.id
+       WHERE a.id = ?`,
+      [id]
+    );
+
+    if (appointments.length === 0) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    // Check authorization
+    const appointment = appointments[0];
+    if (req.user.role === 'patient') {
+      const [patients] = await promisePool.execute(
+        'SELECT id FROM patients WHERE user_id = ?',
+        [req.user.id]
+      );
+      if (patients.length > 0 && appointment.patient_id !== patients[0].id) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+    } else if (req.user.role === 'doctor') {
+      const [doctors] = await promisePool.execute(
+        'SELECT id FROM doctors WHERE user_id = ?',
+        [req.user.id]
+      );
+      if (doctors.length > 0 && appointment.doctor_id !== doctors[0].id) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+    }
+
+    res.json({ appointment: appointments[0] });
+  } catch (error) {
+    console.error('Get appointment error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const updateAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, appointment_date, appointment_time, notes } = req.body;
+
+    // Check if appointment exists
+    const [appointments] = await promisePool.execute(
+      'SELECT * FROM appointments WHERE id = ?',
+      [id]
+    );
+
+    if (appointments.length === 0) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    const appointment = appointments[0];
+
+    // Authorization check
+    if (req.user.role === 'patient' && status && status !== 'cancelled') {
+      return res.status(403).json({ message: 'Patients can only cancel appointments' });
+    }
+
+    // Build update query
+    const updates = [];
+    const params = [];
+
+    if (status) {
+      updates.push('status = ?');
+      params.push(status);
+    }
+
+    if (appointment_date) {
+      updates.push('appointment_date = ?');
+      params.push(appointment_date);
+    }
+
+    if (appointment_time) {
+      updates.push('appointment_time = ?');
+      params.push(appointment_time);
+    }
+
+    if (notes !== undefined) {
+      updates.push('notes = ?');
+      params.push(notes);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    params.push(id);
+
+    await promisePool.execute(
+      `UPDATE appointments SET ${updates.join(', ')} WHERE id = ?`,
+      params
+    );
+
+    // Get updated appointment
+    const [updated] = await promisePool.execute(
+      `SELECT a.*, 
+       p.user_id as patient_user_id, u1.name as patient_name, u1.email as patient_email,
+       d.user_id as doctor_user_id, u2.name as doctor_name, u2.email as doctor_email, d.specialization
+       FROM appointments a
+       JOIN patients p ON a.patient_id = p.id
+       JOIN users u1 ON p.user_id = u1.id
+       JOIN doctors d ON a.doctor_id = d.id
+       JOIN users u2 ON d.user_id = u2.id
+       WHERE a.id = ?`,
+      [id]
+    );
+
+    res.json({
+      message: 'Appointment updated successfully',
+      appointment: updated[0]
+    });
+  } catch (error) {
+    console.error('Update appointment error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
