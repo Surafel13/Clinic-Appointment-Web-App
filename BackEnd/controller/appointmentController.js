@@ -279,3 +279,28 @@ export const updateAppointment = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const deleteAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Only admin can delete
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const [result] = await promisePool.execute(
+      'DELETE FROM appointments WHERE id = ?',
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    res.json({ message: 'Appointment deleted successfully' });
+  } catch (error) {
+    console.error('Delete appointment error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
