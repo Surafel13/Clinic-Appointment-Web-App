@@ -89,3 +89,64 @@ export const createAppointment = async (req, res) => {
   }
 };
 
+export const getAppointments = async (req, res) => {
+  try {
+    const { status, patient_id, doctor_id } = req.query;
+    let query = `SELECT a.*, 
+      p.user_id as patient_user_id, u1.name as patient_name, u1.email as patient_email,
+      d.user_id as doctor_user_id, u2.name as doctor_name, u2.email as doctor_email, d.specialization
+      FROM appointments a
+      JOIN patients p ON a.patient_id = p.id
+      JOIN users u1 ON p.user_id = u1.id
+      JOIN doctors d ON a.doctor_id = d.id
+      JOIN users u2 ON d.user_id = u2.id
+      WHERE 1=1`;
+    
+    const params = [];
+
+    // Role-based filtering
+    if (req.user.role === 'patient') {
+      const [patients] = await promisePool.execute(
+        'SELECT id FROM patients WHERE user_id = ?',
+        [req.user.id]
+      );
+      if (patients.length > 0) {
+        query += ' AND a.patient_id = ?';
+        params.push(patients[0].id);
+      }
+    } else if (req.user.role === 'doctor') {
+      const [doctors] = await promisePool.execute(
+        'SELECT id FROM doctors WHERE user_id = ?',
+        [req.user.id]
+      );
+      if (doctors.length > 0) {
+        query += ' AND a.doctor_id = ?';
+        params.push(doctors[0].id);
+      }
+    }
+
+    if (status) {
+      query += ' AND a.status = ?';
+      params.push(status);
+    }
+
+    if (patient_id && req.user.role === 'admin') {
+      query += ' AND a.patient_id = ?';
+      params.push(patient_id);
+    }
+
+    if (doctor_id && req.user.role === 'admin') {
+      query += ' AND a.doctor_id = ?';
+      params.push(doctor_id);
+    }
+
+    query += ' ORDER BY a.appointment_date DESC, a.appointment_time DESC';
+
+    const [appointments] = await promisePool.execute(query, params);
+
+    res.json({ appointments });
+  } catch (error) {
+    console.error('Get appointments error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
