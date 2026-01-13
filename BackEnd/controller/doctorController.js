@@ -37,7 +37,7 @@ export const updateDoctorProfile = async (req, res) => {
     if (req.body.name || req.body.email) {
       const updates = [];
       const params = [];
-      
+
       if (req.body.name) {
         updates.push('name = ?');
         params.push(req.body.name);
@@ -46,7 +46,7 @@ export const updateDoctorProfile = async (req, res) => {
         updates.push('email = ?');
         params.push(req.body.email);
       }
-      
+
       params.push(userId);
       await promisePool.execute(
         `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
