@@ -1,4 +1,4 @@
-import { promisePool } from '../config/database.js';
+import { promisePool } from '../Config/database.js';
 import { validationResult } from 'express-validator';
 
 export const createAppointment = async (req, res) => {
@@ -101,7 +101,7 @@ export const getAppointments = async (req, res) => {
       JOIN doctors d ON a.doctor_id = d.id
       JOIN users u2 ON d.user_id = u2.id
       WHERE 1=1`;
-    
+
     const params = [];
 
     // Role-based filtering

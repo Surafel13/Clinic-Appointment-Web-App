@@ -1,4 +1,4 @@
-import { promisePool } from '../config/database.js';
+import { promisePool } from '../Config/database.js';
 
 export const getDoctorProfile = async (req, res) => {
   try {

@@ -1,4 +1,4 @@
-import { promisePool } from '../config/database.js';
+import { promisePool } from '../Config/database.js';
 import bcrypt from 'bcryptjs';
 
 export const getDashboardStats = async (req, res) => {
@@ -24,7 +24,7 @@ export const getDashboardStats = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const { role } = req.query;
-    
+
     let query = 'SELECT id, name, email, role, created_at FROM users WHERE 1=1';
     const params = [];
 

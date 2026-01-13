@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { promisePool } from '../config/database.js';
+import { promisePool } from '../Config/database.js';
 import { validationResult } from 'express-validator';
 
 export const register = async (req, res) => {
