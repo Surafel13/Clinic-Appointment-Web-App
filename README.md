@@ -253,17 +253,10 @@ The application is fully responsive and works on:
 - [ ] Video consultation integration
 - [ ] Multi-language support
 
-## 📄 License
-
-This project is open source and available under the MIT License.
 
 ## 👥 Contributing
 
 Contributions, issues, and feature requests are welcome!
-
-## 📞 Support
-
-For support, email support@clinicapp.com or create an issue in the repository.
 
 ---
 
