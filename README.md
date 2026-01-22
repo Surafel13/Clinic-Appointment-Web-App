@@ -66,8 +66,8 @@ A full-stack web application for managing clinic appointments, patients, doctors
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
-cd Courser
+git clone <https://github.com/Surafel13/Clinic-Appointment-Web-App.git>
+cd Clinic-Appointment-Web-App
 ```
 
 ### 2. Backend Setup
