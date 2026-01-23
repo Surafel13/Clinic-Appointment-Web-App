@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { promisePool } from '../Config/database.js';
+import db from '../Config/database.js';
 import { validationResult } from 'express-validator';
 
 export const register = async (req, res) => {
@@ -13,7 +13,7 @@ export const register = async (req, res) => {
     const { name, email, password, role, phone, address, date_of_birth, gender, specialization } = req.body;
 
     // Check if user exists
-    const [existingUser] = await promisePool.execute(
+    const [existingUser] = await db.execute(
       'SELECT * FROM users WHERE email = ?',
       [email]
     );
@@ -26,7 +26,7 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Start transaction
-    const connection = await promisePool.getConnection();
+    const connection = await db.getConnection();
     await connection.beginTransaction();
 
     try {
@@ -91,7 +91,7 @@ export const login = async (req, res) => {
     }
 
     // Find user
-    const [users] = await promisePool.execute(
+    const [users] = await db.execute(
       'SELECT * FROM users WHERE email = ?',
       [email]
     );
@@ -135,7 +135,7 @@ export const getMe = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const [users] = await promisePool.execute(
+    const [users] = await db.execute(
       'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
       [userId]
     );
@@ -148,13 +148,13 @@ export const getMe = async (req, res) => {
 
     // Get role-specific data
     if (user.role === 'patient') {
-      const [patients] = await promisePool.execute(
+      const [patients] = await db.execute(
         'SELECT * FROM patients WHERE user_id = ?',
         [userId]
       );
       user.profile = patients[0] || null;
     } else if (user.role === 'doctor') {
-      const [doctors] = await promisePool.execute(
+      const [doctors] = await db.execute(
         'SELECT * FROM doctors WHERE user_id = ?',
         [userId]
       );

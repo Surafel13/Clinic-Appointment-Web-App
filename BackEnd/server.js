@@ -20,14 +20,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Test database connection
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error('Database connection failed:', err);
-  } else {
-    console.log('✅ Database connected successfully');
-    connection.release();
-  }
-});
+try {
+  const connection = await db.getConnection();
+  console.log('✅ Database connected successfully');
+  connection.release();
+} catch (err) {
+  console.error('Database connection failed:', err);
+}
 
 // Routes
 app.use('/api/auth', authRoutes);

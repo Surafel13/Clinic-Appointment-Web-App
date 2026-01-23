@@ -1,10 +1,10 @@
-import { promisePool } from '../Config/database.js';
+import db from '../Config/database.js';
 
 export const getPatientProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const [users] = await promisePool.execute(
+    const [users] = await db.execute(
       'SELECT id, name, email, role FROM users WHERE id = ?',
       [userId]
     );
@@ -13,7 +13,7 @@ export const getPatientProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const [patients] = await promisePool.execute(
+    const [patients] = await db.execute(
       'SELECT * FROM patients WHERE user_id = ?',
       [userId]
     );
@@ -48,14 +48,14 @@ export const updatePatientProfile = async (req, res) => {
       }
 
       params.push(userId);
-      await promisePool.execute(
+      await db.execute(
         `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
         params
       );
     }
 
     // Update or create patient profile
-    const [patients] = await promisePool.execute(
+    const [patients] = await db.execute(
       'SELECT id FROM patients WHERE user_id = ?',
       [userId]
     );
@@ -72,13 +72,13 @@ export const updatePatientProfile = async (req, res) => {
 
       if (updates.length > 0) {
         params.push(patients[0].id);
-        await promisePool.execute(
+        await db.execute(
           `UPDATE patients SET ${updates.join(', ')} WHERE id = ?`,
           params
         );
       }
     } else {
-      await promisePool.execute(
+      await db.execute(
         'INSERT INTO patients (user_id, phone, address, date_of_birth, gender, emergency_contact) VALUES (?, ?, ?, ?, ?, ?)',
         [userId, phone || null, address || null, date_of_birth || null, gender || null, emergency_contact || null]
       );
@@ -95,7 +95,7 @@ export const getMedicalRecords = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const [patients] = await promisePool.execute(
+    const [patients] = await db.execute(
       'SELECT id FROM patients WHERE user_id = ?',
       [userId]
     );
@@ -106,7 +106,7 @@ export const getMedicalRecords = async (req, res) => {
 
     const patientId = patients[0].id;
 
-    const [records] = await promisePool.execute(
+    const [records] = await db.execute(
       `SELECT mr.*, 
        u.name as doctor_name, d.specialization,
        a.appointment_date, a.appointment_time

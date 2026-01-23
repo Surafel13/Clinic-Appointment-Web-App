@@ -1,4 +1,4 @@
-import { promisePool } from '../Config/database.js';
+import db from '../Config/database.js';
 import { validationResult } from 'express-validator';
 
 export const createAppointment = async (req, res) => {
@@ -13,7 +13,7 @@ export const createAppointment = async (req, res) => {
 
     // If user is a patient, get their patient_id from the database
     if (req.user.role === 'patient' && !patient_id) {
-      const [patients] = await promisePool.execute(
+      const [patients] = await db.execute(
         'SELECT id FROM patients WHERE user_id = ?',
         [req.user.id]
       );
@@ -30,7 +30,7 @@ export const createAppointment = async (req, res) => {
     }
 
     // Check if patient exists
-    const [patients] = await promisePool.execute(
+    const [patients] = await db.execute(
       'SELECT id FROM patients WHERE id = ?',
       [patient_id]
     );
@@ -40,7 +40,7 @@ export const createAppointment = async (req, res) => {
     }
 
     // Check if doctor exists
-    const [doctors] = await promisePool.execute(
+    const [doctors] = await db.execute(
       'SELECT id FROM doctors WHERE id = ?',
       [doctor_id]
     );
@@ -50,7 +50,7 @@ export const createAppointment = async (req, res) => {
     }
 
     // Check for double-booking
-    const [existing] = await promisePool.execute(
+    const [existing] = await db.execute(
       'SELECT id FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ? AND status != "cancelled"',
       [doctor_id, appointment_date, appointment_time]
     );
@@ -60,13 +60,13 @@ export const createAppointment = async (req, res) => {
     }
 
     // Create appointment
-    const [result] = await promisePool.execute(
+    const [result] = await db.execute(
       'INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, reason, status) VALUES (?, ?, ?, ?, ?, "pending")',
       [patient_id, doctor_id, appointment_date, appointment_time, reason || null]
     );
 
     // Get created appointment with details
-    const [appointments] = await promisePool.execute(
+    const [appointments] = await db.execute(
       `SELECT a.*, 
        p.user_id as patient_user_id, u1.name as patient_name, u1.email as patient_email,
        d.user_id as doctor_user_id, u2.name as doctor_name, u2.email as doctor_email
@@ -106,7 +106,7 @@ export const getAppointments = async (req, res) => {
 
     // Role-based filtering
     if (req.user.role === 'patient') {
-      const [patients] = await promisePool.execute(
+      const [patients] = await db.execute(
         'SELECT id FROM patients WHERE user_id = ?',
         [req.user.id]
       );
@@ -115,7 +115,7 @@ export const getAppointments = async (req, res) => {
         params.push(patients[0].id);
       }
     } else if (req.user.role === 'doctor') {
-      const [doctors] = await promisePool.execute(
+      const [doctors] = await db.execute(
         'SELECT id FROM doctors WHERE user_id = ?',
         [req.user.id]
       );
@@ -142,7 +142,7 @@ export const getAppointments = async (req, res) => {
 
     query += ' ORDER BY a.appointment_date DESC, a.appointment_time DESC';
 
-    const [appointments] = await promisePool.execute(query, params);
+    const [appointments] = await db.execute(query, params);
 
     res.json({ appointments });
   } catch (error) {
@@ -155,7 +155,7 @@ export const getAppointmentById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [appointments] = await promisePool.execute(
+    const [appointments] = await db.execute(
       `SELECT a.*, 
        p.user_id as patient_user_id, u1.name as patient_name, u1.email as patient_email,
        d.user_id as doctor_user_id, u2.name as doctor_name, u2.email as doctor_email, d.specialization
@@ -175,7 +175,7 @@ export const getAppointmentById = async (req, res) => {
     // Check authorization
     const appointment = appointments[0];
     if (req.user.role === 'patient') {
-      const [patients] = await promisePool.execute(
+      const [patients] = await db.execute(
         'SELECT id FROM patients WHERE user_id = ?',
         [req.user.id]
       );
@@ -183,7 +183,7 @@ export const getAppointmentById = async (req, res) => {
         return res.status(403).json({ message: 'Access denied' });
       }
     } else if (req.user.role === 'doctor') {
-      const [doctors] = await promisePool.execute(
+      const [doctors] = await db.execute(
         'SELECT id FROM doctors WHERE user_id = ?',
         [req.user.id]
       );
@@ -205,7 +205,7 @@ export const updateAppointment = async (req, res) => {
     const { status, appointment_date, appointment_time, notes } = req.body;
 
     // Check if appointment exists
-    const [appointments] = await promisePool.execute(
+    const [appointments] = await db.execute(
       'SELECT * FROM appointments WHERE id = ?',
       [id]
     );
@@ -251,13 +251,13 @@ export const updateAppointment = async (req, res) => {
 
     params.push(id);
 
-    await promisePool.execute(
+    await db.execute(
       `UPDATE appointments SET ${updates.join(', ')} WHERE id = ?`,
       params
     );
 
     // Get updated appointment
-    const [updated] = await promisePool.execute(
+    const [updated] = await db.execute(
       `SELECT a.*, 
        p.user_id as patient_user_id, u1.name as patient_name, u1.email as patient_email,
        d.user_id as doctor_user_id, u2.name as doctor_name, u2.email as doctor_email, d.specialization
@@ -289,7 +289,7 @@ export const deleteAppointment = async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    const [result] = await promisePool.execute(
+    const [result] = await db.execute(
       'DELETE FROM appointments WHERE id = ?',
       [id]
     );

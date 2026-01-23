@@ -1,9 +1,9 @@
-import { promisePool } from '../Config/database.js';
+import db from '../Config/database.js';
 import bcrypt from 'bcryptjs';
 
 export const getDashboardStats = async (req, res) => {
   try {
-    const [stats] = await promisePool.execute(`
+    const [stats] = await db.execute(`
       SELECT 
         (SELECT COUNT(*) FROM users WHERE role = 'patient') as total_patients,
         (SELECT COUNT(*) FROM users WHERE role = 'doctor') as total_doctors,
@@ -35,7 +35,7 @@ export const getAllUsers = async (req, res) => {
 
     query += ' ORDER BY created_at DESC';
 
-    const [users] = await promisePool.execute(query, params);
+    const [users] = await db.execute(query, params);
 
     res.json({ users });
   } catch (error) {
@@ -48,7 +48,7 @@ export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [users] = await promisePool.execute(
+    const [users] = await db.execute(
       'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
       [id]
     );
@@ -61,13 +61,13 @@ export const getUserById = async (req, res) => {
 
     // Get role-specific data
     if (user.role === 'patient') {
-      const [patients] = await promisePool.execute(
+      const [patients] = await db.execute(
         'SELECT * FROM patients WHERE user_id = ?',
         [id]
       );
       user.profile = patients[0] || null;
     } else if (user.role === 'doctor') {
-      const [doctors] = await promisePool.execute(
+      const [doctors] = await db.execute(
         'SELECT * FROM doctors WHERE user_id = ?',
         [id]
       );
@@ -108,7 +108,7 @@ export const updateUser = async (req, res) => {
 
     params.push(id);
 
-    await promisePool.execute(
+    await db.execute(
       `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
       params
     );
@@ -129,7 +129,7 @@ export const deleteUser = async (req, res) => {
       return res.status(400).json({ message: 'Cannot delete your own account' });
     }
 
-    const [result] = await promisePool.execute(
+    const [result] = await db.execute(
       'DELETE FROM users WHERE id = ?',
       [id]
     );
@@ -178,7 +178,7 @@ export const getAllAppointments = async (req, res) => {
 
     query += ' ORDER BY a.appointment_date DESC, a.appointment_time DESC';
 
-    const [appointments] = await promisePool.execute(query, params);
+    const [appointments] = await db.execute(query, params);
 
     res.json({ appointments });
   } catch (error) {
