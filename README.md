@@ -66,8 +66,8 @@ A full-stack web application for managing clinic appointments, patients, doctors
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
-cd Courser
+git clone <https://github.com/Surafel13/Clinic-Appointment-Web-App.git>
+cd Clinic-Appointment-Web-App
 ```
 
 ### 2. Backend Setup
@@ -253,17 +253,10 @@ The application is fully responsive and works on:
 - [ ] Video consultation integration
 - [ ] Multi-language support
 
-## 📄 License
-
-This project is open source and available under the MIT License.
 
 ## 👥 Contributing
 
 Contributions, issues, and feature requests are welcome!
-
-## 📞 Support
-
-For support, email support@clinicapp.com or create an issue in the repository.
 
 ---
 
