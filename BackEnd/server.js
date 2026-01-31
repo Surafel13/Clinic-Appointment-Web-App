@@ -1,13 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import db from './Config/database.js';
+import connectDB from './config/database.js';
+
 import authRoutes from './routes/authRoutes.js';
 import patientRoutes from './routes/patientRoutes.js';
 import doctorRoutes from './routes/doctorRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
-
 
 dotenv.config();
 
@@ -19,14 +19,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Test database connection
-try {
-  const connection = await db.getConnection();
-  console.log('✅ Database connected successfully');
-  connection.release();
-} catch (err) {
-  console.error('Database connection failed:', err);
-}
+// MongoDB connection
+connectDB();
 
 // Routes
 app.use('/api/auth', authRoutes);

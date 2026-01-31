@@ -7,7 +7,7 @@ import {
   getAllDoctors,
   createMedicalRecord,
   updateMedicalRecord
-} from '../controller/doctorController.js';
+} from '../controllers/doctorController.js';
 
 const router = express.Router();
 

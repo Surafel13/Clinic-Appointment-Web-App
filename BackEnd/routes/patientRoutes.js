@@ -4,7 +4,7 @@ import {
   getPatientProfile,
   updatePatientProfile,
   getMedicalRecords
-} from '../controller/patientController.js';
+} from '../controllers/patientController.js';
 
 const router = express.Router();
 

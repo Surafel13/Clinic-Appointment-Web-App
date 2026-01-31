@@ -6,7 +6,7 @@ import {
   getAppointmentById,
   updateAppointment,
   deleteAppointment
-} from '../controller/appointmentController.js';
+} from '../controllers/appointmentController.js';
 import { body } from 'express-validator';
 
 const router = express.Router();

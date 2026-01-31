@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://clinic-appointment-web-app.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },

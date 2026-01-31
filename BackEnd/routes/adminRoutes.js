@@ -7,7 +7,7 @@ import {
   updateUser,
   deleteUser,
   getAllAppointments
-} from '../controller/adminController.js';
+} from '../controllers/adminController.js';
 
 const router = express.Router();
 
