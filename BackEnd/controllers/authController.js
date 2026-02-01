@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
-import db from '../config/database.js';
 import getNextId from '../models/getNextId.js';
 import User from '../models/user.js';
 import Patient from '../models/patient.js';

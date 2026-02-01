@@ -1,4 +1,3 @@
-import db from '../config/database.js';
 import User from '../models/user.js';
 import Patient from '../models/patient.js';
 import Doctor from '../models/doctor.js';

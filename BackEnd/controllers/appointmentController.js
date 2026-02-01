@@ -1,5 +1,4 @@
 import { validationResult } from 'express-validator';
-import db from '../config/database.js';
 import getNextId from '../models/getNextId.js';
 import Appointment from '../models/appointment.js';
 import Patient from '../models/patient.js';
