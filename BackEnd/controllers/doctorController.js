@@ -8,7 +8,6 @@ import MedicalRecord from '../models/medicalRecord.js';
 
 export const getDoctorProfile = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
 
@@ -34,7 +33,6 @@ export const getDoctorProfile = async (req, res) => {
 
 export const updateDoctorProfile = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
     const { specialization, phone, address, license_number, experience_years, bio } = req.body;
@@ -92,7 +90,6 @@ export const updateDoctorProfile = async (req, res) => {
 
 export const getDoctorAppointments = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
 
@@ -159,7 +156,6 @@ export const getDoctorAppointments = async (req, res) => {
 
 export const getAllDoctors = async (req, res) => {
   try {
-    await db.connect();
 
     const doctors = await Doctor.aggregate([
       {
@@ -203,7 +199,6 @@ export const getAllDoctors = async (req, res) => {
 
 export const createMedicalRecord = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
     const { patient_id, appointment_id, diagnosis, prescription, notes, record_date } = req.body;
@@ -279,7 +274,6 @@ export const createMedicalRecord = async (req, res) => {
 
 export const updateMedicalRecord = async (req, res) => {
   try {
-    await db.connect();
 
     const { id } = req.params;
     const { diagnosis, prescription, notes, record_date } = req.body;

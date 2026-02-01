@@ -7,7 +7,6 @@ import MedicalRecord from '../models/medicalRecord.js';
 
 export const getPatientProfile = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
 
@@ -33,7 +32,6 @@ export const getPatientProfile = async (req, res) => {
 
 export const updatePatientProfile = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
     const { phone, address, date_of_birth, gender, emergency_contact } = req.body;
@@ -90,7 +88,6 @@ export const updatePatientProfile = async (req, res) => {
 
 export const getMedicalRecords = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
 

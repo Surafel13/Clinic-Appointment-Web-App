@@ -9,7 +9,6 @@ import Doctor from '../models/doctor.js';
 
 export const register = async (req, res) => {
   try {
-    await db.connect();
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -99,7 +98,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    await db.connect();
+
 
     const { email, password } = req.body;
 
@@ -144,7 +143,6 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
-    await db.connect();
 
     const userId = req.user.id;
 

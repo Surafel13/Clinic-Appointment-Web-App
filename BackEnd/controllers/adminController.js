@@ -8,7 +8,6 @@ import MedicalRecord from '../models/medicalRecord.js';
 
 export const getDashboardStats = async (req, res) => {
   try {
-    await db.connect();
 
     const [
       total_patients,
@@ -47,7 +46,6 @@ export const getDashboardStats = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    await db.connect();
 
     const { role } = req.query;
 
@@ -69,7 +67,6 @@ export const getAllUsers = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    await db.connect();
 
     const { id } = req.params;
 
@@ -101,7 +98,6 @@ export const getUserById = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    await db.connect();
 
     const { id } = req.params;
     const { name, email, role } = req.body;
@@ -126,7 +122,6 @@ export const updateUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    await db.connect();
 
     const { id } = req.params;
 
@@ -164,7 +159,6 @@ export const deleteUser = async (req, res) => {
 
 export const getAllAppointments = async (req, res) => {
   try {
-    await db.connect();
 
     const { status, patient_id, doctor_id } = req.query;
     const match = {};

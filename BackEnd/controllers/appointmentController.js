@@ -8,7 +8,6 @@ import MedicalRecord from '../models/medicalRecord.js';
 
 export const createAppointment = async (req, res) => {
   try {
-    await db.connect();
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -148,7 +147,6 @@ export const createAppointment = async (req, res) => {
 
 export const getAppointments = async (req, res) => {
   try {
-    await db.connect();
 
     const { status, patient_id, doctor_id } = req.query;
     const match = {};
@@ -256,7 +254,6 @@ export const getAppointments = async (req, res) => {
 
 export const getAppointmentById = async (req, res) => {
   try {
-    await db.connect();
 
     const { id } = req.params;
     const appointmentId = parseInt(id, 10);
@@ -356,7 +353,6 @@ export const getAppointmentById = async (req, res) => {
 
 export const updateAppointment = async (req, res) => {
   try {
-    await db.connect();
 
     const { id } = req.params;
     const { status, appointment_date, appointment_time, notes } = req.body;
@@ -475,7 +471,6 @@ export const updateAppointment = async (req, res) => {
 export const deleteAppointment = async (req, res) => {
   try {
     const { id } = req.params;
-    await db.connect();
 
     // Only admin can delete
     if (req.user.role !== 'admin') {
